@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts-config PUBLIC 
+"-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" 
+"http://jakarta.apache.org/struts/dtds/struts-config_1_3.dtd">
+
+<struts-config>
+
+	<form-beans>
+		<form-bean name="account" type="Siirex.model.AccountForm" />
+		<form-bean name="searchBean" type="Siirex.model.SearchValueForm" />
+	</form-beans>
+	
+	<!--  -->
+	<global-forwards>
+		<forward name="controller" path="/controller.do"/>
+	</global-forwards>
+	
+	<action-mappings>
+
+		<!-- 1. Client sent request "/controller.do", forward to "/pages/login.jsp"  -->
+		<action path="/controller" forward="/pages/login.jsp"/>
+		<action path="/coontroller" type="org.apache.struts.actions.ForwardAction" parameter="/pages/login.jsp" />
+		
+		<!-- 2. From "/pages/login.jsp", Client sent POST request "/login.do", forward to:
+			 "/pages/welcome.jsp" 		(valid)
+			 "/pages/loginFailed.jsp"	(invalid) -->
+		<action path="/login" type="Siirex.controller.LoginAction" name="account" 
+				scope="session" validate="false" input="/pages/login.jsp">
+			<forward name="success" path="/pages/welcome.jsp"></forward>
+			<forward name="failed" path="/pages/loginFailed.jsp" redirect="true"></forward>	<!-- "redirect" làm tăng tốc độ chuyển trang -->	
+		</action>
+
+		<!-- 3. From "/pages/loginFailed.jsp", Client sent request "/loginTryAgain.do", forward again to "/pages/login.jsp" -->
+		<action path="/loginTryAgain" forward="/pages/login.jsp" />
+
+		<!-- 4. -->
+		<action path="/logout" type="Siirex.controller.LogoutAction" validate="false">
+			<forward name="success" path="/pages/login.jsp" />
+		</action>
+
+		<!-- 4. -->
+		<action path="/searchPage" forward="/pages/search.jsp" name="searchBean" />
+
+		<!-- 5. From "/pages/search.jsp", Client sent POST request "/searchProcess.do", forward to "/pages/search.jsp" (refresh page) -->
+		<action path="/searchProcess" type="Siirex.controller.SearchAction" name="searchBean"
+				scope="request" validate="false" input="/pages/search.jsp">
+			<forward name="success" path="/pages/search.jsp"></forward>
+			<forward name="failed" path="/pages/searchFailed.jsp"></forward>			
+		</action>
+		
+		<!-- 6. -->
+		<action path="/searchTryAgain" forward="/pages/search.jsp" />
+		
+	</action-mappings>
+	
+	<message-resources parameter="ApplicationResources" />
+
+</struts-config>
